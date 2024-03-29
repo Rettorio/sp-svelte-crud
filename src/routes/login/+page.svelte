@@ -1,9 +1,9 @@
 <script lang="ts">
 	import * as Card from '$lib/components/ui/card/index.js';
 	import LoginForm from './login-form.svelte';
-	import type { PageData } from '../$types';
+	import type { PageServerData } from '../$types';
 
-	export let data: PageData;
+	export let data: PageServerData;
 </script>
 
 <div class="mx-auto mt-14 max-w-xl">

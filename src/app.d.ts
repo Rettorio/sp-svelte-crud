@@ -9,6 +9,18 @@ type User = {
 	phone: string | undefined;
 };
 
+type Division = {
+	id: string;
+	name: string;
+	salar_rate: number;
+};
+
+type Position = {
+	id: string;
+	name: string;
+	salary: number;
+};
+
 // for information about these interfaces
 declare global {
 	namespace App {

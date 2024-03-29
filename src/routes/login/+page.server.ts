@@ -25,9 +25,9 @@ export const actions: Actions = {
 			return fail(400, { form });
 		}
 
-		console.log(form.data, data);
+		console.log(form.data, 'Sign in successful');
 		if (data) {
-			return redirect(302, '/me');
+			return redirect(302, '/employee');
 		}
 		return {
 			form

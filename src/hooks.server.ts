@@ -28,7 +28,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const protectedRoute =
 		url.pathname.startsWith('/division') ||
 		url.pathname.startsWith('/position') ||
-		url.pathname.startsWith('/dashboard');
+		url.pathname.startsWith('/employee');
 	//if client visit protectedRoute and user is null redirect to login
 	if (protectedRoute && !user) {
 		return redirect(302, '/login');
