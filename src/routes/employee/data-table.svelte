@@ -1,25 +1,20 @@
 <script lang="ts">
 	import { readable } from 'svelte/store';
 	import { createRender, createTable, Render, Subscribe } from 'svelte-headless-table';
+	import { addPagination } from 'svelte-headless-table/plugins';
 	import * as Table from '$lib/components/ui/table';
 	import DataTableActions from './data-table-actions.svelte';
+	import { Button } from '$lib/components/ui/button';
 
-	export let data;
+	export let data: Employee[];
 
-	type employee = {
-		id: number;
-		name: string;
-		age: number;
-		division: string;
-		position_name: string;
-		salary: number;
-	};
-
-	const table = createTable(readable(data));
+	const table = createTable(readable(data), {
+		page: addPagination()
+	});
 	const columns = table.createColumns([
 		table.column({
-			accessor: 'id',
-			header: 'ID'
+			header: 'ID',
+			accessor: (item) => item.id
 		}),
 		table.column({
 			accessor: 'name',
@@ -30,12 +25,12 @@
 			header: 'Age'
 		}),
 		table.column({
-			accessor: 'division',
-			header: 'Division'
+			header: 'Division',
+			accessor: 'division'
 		}),
 		table.column({
-			accessor: 'position_name',
-			header: 'Position'
+			header: 'Position',
+			accessor: 'position_name'
 		}),
 		table.column({
 			accessor: 'salary',
@@ -46,7 +41,7 @@
 					currency: 'USD',
 					minimumFractionDigits: 0,
 					maximumFractionDigits: 0
-				}).format(value);
+				}).format(parseInt(value));
 				return formatted;
 			}
 		}),
@@ -54,12 +49,14 @@
 			accessor: ({ id }) => id,
 			header: '',
 			cell: ({ value }) => {
-				return createRender(DataTableActions, { id: value });
+				return createRender(DataTableActions, { id: value.toString() });
 			}
 		})
 	]);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs } = table.createViewModel(columns);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
+		table.createViewModel(columns);
+	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
 </script>
 
 <div class="rounded-md border">
@@ -101,4 +98,18 @@
 			{/each}
 		</Table.Body>
 	</Table.Root>
+</div>
+<div class="flex items-center justify-end space-x-4 py-4">
+	<Button
+		variant="outline"
+		size="sm"
+		on:click={() => ($pageIndex = $pageIndex - 1)}
+		disabled={!$hasPreviousPage}>Previous</Button
+	>
+	<Button
+		variant="outline"
+		size="sm"
+		disabled={!$hasNextPage}
+		on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+	>
 </div>

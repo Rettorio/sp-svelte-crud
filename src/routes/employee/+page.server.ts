@@ -1,11 +1,15 @@
 import { fail } from '@sveltejs/kit';
-import type { PageServerLoad } from '../login/$types';
+import type { PageServerLoad } from './$types';
 
+export const ssr = true;
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const supabase = locals.supabase;
 	const page = url.searchParams.get('page');
-	const fromrow = !page ? 1 : (parseInt(page) - 1) * 50 + 1;
-	const torow = !page ? 50 : parseInt(page) * 50;
+	const totalRow = 25;
+	// const fromrow = !page ? 1 : (parseInt(page) - 1) * totalRow + 1;
+	// const torow = !page ? totalRow : parseInt(page) * totalRow;
+	const fromrow = 1;
+	const torow = 50;
 	const { data: employee, error } = await supabase
 		.rpc('employee_pagination', { fromrow, torow })
 		.select();
