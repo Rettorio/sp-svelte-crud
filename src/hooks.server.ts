@@ -15,6 +15,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return session;
 	};
 
+	console.time('Handle');
 	event.locals.supabase = createSupabaseServerClient(event);
 	event.locals.session = await getSession();
 	const user = (await event.locals.supabase.auth.getUser()).data.user;
@@ -36,5 +37,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const response = await resolve(event, {
 		filterSerializedResponseHeaders: (name) => name == 'content-page'
 	});
+	console.timeEnd('Handle');
 	return response;
 };

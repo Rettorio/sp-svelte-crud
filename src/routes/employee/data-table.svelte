@@ -6,7 +6,7 @@
 	import DataTableActions from './data-table-actions.svelte';
 	import { Button } from '$lib/components/ui/button';
 
-	export let data: Employee[];
+	export let data: Employee[] | null;
 
 	const table = createTable(readable(data), {
 		page: addPagination()

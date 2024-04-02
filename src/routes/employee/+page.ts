@@ -15,8 +15,9 @@ export const load: PageLoad = async ({ data, parent }) => {
 
 	if (error) {
 		console.log(error);
-		return fail(500, { employee: emp });
+		return fail(500, { error });
 	}
 
-	return { employee: emp };
+	data.employee = emp;
+	return data;
 };
