@@ -1,20 +1,30 @@
 <script lang="ts">
 	import { readable } from 'svelte/store';
 	import { createRender, createTable, Render, Subscribe } from 'svelte-headless-table';
-	import { addPagination } from 'svelte-headless-table/plugins';
+	import { addPagination, addTableFilter } from 'svelte-headless-table/plugins';
 	import * as Table from '$lib/components/ui/table';
 	import DataTableActions from './data-table-actions.svelte';
 	import { Button } from '$lib/components/ui/button';
+	import { Input } from '$lib/components/ui/input';
 
-	export let data: Employee[] | null;
+	export let data: Employee[];
 
 	const table = createTable(readable(data), {
-		page: addPagination()
+		page: addPagination(),
+		filter: addTableFilter({
+			fn: ({ filterValue, value }) =>
+				value.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase())
+		})
 	});
 	const columns = table.createColumns([
 		table.column({
 			header: 'ID',
-			accessor: (item) => item.id
+			accessor: (item) => item.id,
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			}
 		}),
 		table.column({
 			accessor: 'name',
@@ -22,19 +32,39 @@
 		}),
 		table.column({
 			accessor: 'age',
-			header: 'Age'
+			header: 'Age',
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			}
 		}),
 		table.column({
 			header: 'Division',
-			accessor: 'division'
+			accessor: 'division',
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			}
 		}),
 		table.column({
 			header: 'Position',
-			accessor: 'position_name'
+			accessor: 'position_name',
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			}
 		}),
 		table.column({
 			accessor: 'salary',
 			header: 'Salary/Year',
+			plugins: {
+				filter: {
+					exclude: true
+				}
+			},
 			cell: ({ value }) => {
 				const formatted = new Intl.NumberFormat('en-Us', {
 					style: 'currency',
@@ -57,59 +87,65 @@
 	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
 		table.createViewModel(columns);
 	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
+	const { filterValue } = pluginStates.filter;
 </script>
 
-<div class="rounded-md border">
-	<Table.Root {...$tableAttrs}>
-		<Table.Header>
-			{#each $headerRows as headerRow}
-				<Subscribe rowAttrs={headerRow.attrs()}>
-					<Table.Row>
-						{#each headerRow.cells as cell (cell.id)}
-							<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
-								<Table.Head {...attrs}>
-									<Render of={cell.render()} />
-								</Table.Head>
-							</Subscribe>
-						{/each}
-					</Table.Row>
-				</Subscribe>
-			{/each}
-		</Table.Header>
-		<Table.Body {...$tableBodyAttrs}>
-			{#each $pageRows as row (row.id)}
-				<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-					<Table.Row {...rowAttrs}>
-						{#each row.cells as cell (cell.id)}
-							<Subscribe attrs={cell.attrs()} let:attrs>
-								<Table.Cell {...attrs}>
-									{#if cell.id === 'salary'}
-										<div class="font-medium">
-											<Render of={cell.render()} />
-										</div>
-									{:else}
+<div>
+	<div class="flex items-center py-4">
+		<Input class="max-w-sm" placeholder="Search employee" type="text" bind:value={$filterValue} />
+	</div>
+	<div class="rounded-md border">
+		<Table.Root {...$tableAttrs}>
+			<Table.Header>
+				{#each $headerRows as headerRow}
+					<Subscribe rowAttrs={headerRow.attrs()}>
+						<Table.Row>
+							{#each headerRow.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs props={cell.props()}>
+									<Table.Head {...attrs}>
 										<Render of={cell.render()} />
-									{/if}
-								</Table.Cell>
-							</Subscribe>
-						{/each}
-					</Table.Row>
-				</Subscribe>
-			{/each}
-		</Table.Body>
-	</Table.Root>
-</div>
-<div class="flex items-center justify-end space-x-4 py-4">
-	<Button
-		variant="outline"
-		size="sm"
-		on:click={() => ($pageIndex = $pageIndex - 1)}
-		disabled={!$hasPreviousPage}>Previous</Button
-	>
-	<Button
-		variant="outline"
-		size="sm"
-		disabled={!$hasNextPage}
-		on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
-	>
+									</Table.Head>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
+			</Table.Header>
+			<Table.Body {...$tableBodyAttrs}>
+				{#each $pageRows as row (row.id)}
+					<Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+						<Table.Row {...rowAttrs}>
+							{#each row.cells as cell (cell.id)}
+								<Subscribe attrs={cell.attrs()} let:attrs>
+									<Table.Cell {...attrs}>
+										{#if cell.id === 'salary'}
+											<div class="font-medium">
+												<Render of={cell.render()} />
+											</div>
+										{:else}
+											<Render of={cell.render()} />
+										{/if}
+									</Table.Cell>
+								</Subscribe>
+							{/each}
+						</Table.Row>
+					</Subscribe>
+				{/each}
+			</Table.Body>
+		</Table.Root>
+	</div>
+	<div class="flex items-center justify-end space-x-4 py-4">
+		<Button
+			variant="outline"
+			size="sm"
+			on:click={() => ($pageIndex = $pageIndex - 1)}
+			disabled={!$hasPreviousPage}>Previous</Button
+		>
+		<Button
+			variant="outline"
+			size="sm"
+			disabled={!$hasNextPage}
+			on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+		>
+	</div>
 </div>
