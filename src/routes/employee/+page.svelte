@@ -5,6 +5,6 @@
 	export let data: PageData;
 </script>
 
-<div class="mx-auto max-w-2xl py-10">
+<div class="mx-auto max-w-3xl py-10">
 	<DataTable data={data.employee} />
 </div>
