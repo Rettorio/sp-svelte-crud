@@ -13,6 +13,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { ArrowUpDown } from 'lucide-svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
+	import { Trash2, UserPlus } from 'lucide-svelte';
 
 	export let data: Employee[];
 
@@ -126,8 +127,14 @@
 </script>
 
 <div>
-	<div class="flex items-center py-4">
+	<div class="flex items-center justify-between py-4">
 		<Input class="max-w-sm" placeholder="Search employee" type="text" bind:value={$filterValue} />
+		<div class="flex items-center">
+			<Button size="sm" class="mr-2" disabled variant="outline"
+				><Trash2 size="16" class="mr-1" />Delete</Button
+			>
+			<Button size="sm" variant="default"><UserPlus size="16" class="mr-1" />Create</Button>
+		</div>
 	</div>
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
