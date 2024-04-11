@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { superForm, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import * as Form from '$lib/components/ui/form';
-	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { Input } from '$lib/components/ui/input';
 	import * as Select from '$lib/components/ui/select';
 	import { Receipt } from 'lucide-svelte';

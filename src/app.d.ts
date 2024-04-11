@@ -31,13 +31,13 @@ declare global {
 	type Division = {
 		id: string;
 		name: string;
-		salary_rate: number | null;
+		salary_rate: number | string;
 	};
 
 	type Position = {
 		id: string;
 		name: string;
-		salary: number | null;
+		salary: number | string;
 	};
 	namespace App {
 		// interface Error {}

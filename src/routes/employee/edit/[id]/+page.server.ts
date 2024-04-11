@@ -4,7 +4,6 @@ import { fail, message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 import { employeeSchema, type EmployeeSchema } from '../../schema';
 import type { z } from 'zod';
-import { error } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ locals, params, request }) => {
 	const { supabase } = locals;
@@ -22,22 +21,14 @@ export const load: PageServerLoad = async ({ locals, params, request }) => {
 	if (err && err instanceof AuthApiError) {
 		return fail(400, { form });
 	}
-	// const divisions = async () => {
-	// 	return await supabase.from('division').select('id,name');
-	// };
-	// const positions = async () => {
-	// 	return await supabase.from('position').select('id,name');
-	// };
-	const { data: divisions, error: errDiv } = await supabase.from('division').select();
-	const { data: positions, error: errPos } = await supabase.from('position').select();
+	// const { data: divisions, error: errDiv } = await supabase.from('division').select();
+	// const { data: positions, error: errPos } = await supabase.from('position').select();
 
-	if ((errDiv && errDiv instanceof AuthApiError) || (errPos && errPos instanceof AuthApiError)) {
-		throw error(500, { message: 'Something went wrong' });
-	}
+	// if ((errDiv && errDiv instanceof AuthApiError) || (errPos && errPos instanceof AuthApiError)) {
+	// 	throw error(500, { message: 'Something went wrong' });
+	// }
 
 	return {
-		divisions,
-		positions,
 		form,
 		referrerUrl
 	};

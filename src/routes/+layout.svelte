@@ -2,7 +2,9 @@
 	import { onMount } from 'svelte';
 	import type { LayoutData } from './$types';
 	import '../app.pcss';
-	import { invalidate, invalidateAll } from '$app/navigation';
+	import { invalidate } from '$app/navigation';
+	import { Toaster } from '$lib/components/ui/sonner';
+	import { ModeWatcher } from 'mode-watcher';
 
 	export let data: LayoutData;
 	$: ({ supabase } = data);
@@ -12,10 +14,11 @@
 			data: { subscription }
 		} = supabase.auth.onAuthStateChange(() => {
 			invalidate('supabase:auth');
-			invalidateAll();
 		});
 		return () => subscription.unsubscribe();
 	});
 </script>
 
+<ModeWatcher track={false} defaultMode={'light'} />
+<Toaster />
 <slot />

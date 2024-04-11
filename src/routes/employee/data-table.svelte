@@ -14,10 +14,14 @@
 	import { ArrowUpDown } from 'lucide-svelte';
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 	import { Trash2, UserPlus } from 'lucide-svelte';
+	import CreateEmpDialog from './create-emp-dialog.svelte';
+	import { dialogOpen, getEMployee } from './store';
+	import { invalidate } from '$app/navigation';
 
-	export let data: Employee[];
+	export let divisions: Division[], positions: Position[];
 
-	const table = createTable(readable(data), {
+	const getEmployees = getEMployee();
+	const table = createTable(getEmployees, {
 		page: addPagination(),
 		sort: addSortBy(),
 		filter: addTableFilter({
@@ -124,6 +128,8 @@
 	const { filterValue } = pluginStates.filter;
 	const { selectedDataIds } = pluginStates.select;
 	const allowedHeader = ['name', 'division', 'salary'];
+
+	const useDialog = dialogOpen();
 </script>
 
 <div>
@@ -133,7 +139,10 @@
 			<Button size="sm" class="mr-2" disabled variant="outline"
 				><Trash2 size="16" class="mr-1" />Delete</Button
 			>
-			<Button size="sm" variant="default"><UserPlus size="16" class="mr-1" />Create</Button>
+			<Button on:click={() => ($useDialog = true)} size="sm" variant="default"
+				><UserPlus size="16" class="mr-1" />Create</Button
+			>
+			<CreateEmpDialog {divisions} {positions} />
 		</div>
 	</div>
 	<div class="rounded-md border">

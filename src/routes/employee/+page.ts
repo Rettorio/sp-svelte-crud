@@ -1,23 +1,12 @@
-import { fail } from 'sveltekit-superforms';
-import type { PageLoad } from './$types';
-
-export const load: PageLoad = async ({ data, parent }) => {
-	const { employee } = data;
-	if (employee && 'position_name' in employee[0]) {
-		return { employee };
-	}
-	const supabase = (await parent()).supabase;
-	const fromrow = 1;
-	const torow = 50;
-	const { data: emp, error } = await supabase
-		.rpc('employee_pagination', { fromrow, torow })
-		.select();
-
-	if (error) {
-		console.log(error);
-		return fail(500, { error });
-	}
-
-	data.employee = emp;
-	return data;
-};
+export async function load({ fetch, depends }) {
+	depends('employee:data');
+	const response = {
+		employee: await fetch('/api/employee'),
+		divisions: await fetch('/api/divisions'),
+		positions: await fetch('/api/positions')
+	};
+	const employees: Employee[] = await response.employee.json();
+	const divisions: Division[] = await response.divisions.json();
+	const positions: Position[] = await response.positions.json();
+	return { employees, divisions, positions };
+}
