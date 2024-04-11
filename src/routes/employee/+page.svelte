@@ -36,19 +36,20 @@
 				return;
 			}
 			try {
-				const response = await fetch('/api/employee', {
+				const response = fetch('/api/employee', {
 					method: 'POST',
 					body: JSON.stringify(form.data)
 				});
-				if (!response.ok) {
-					console.log('something went wrong.');
-				}
-				toast.success('Message :', { description: 'New employee have been created.' });
+				toast.promise(response, {
+					loading: 'Creating employe...',
+					success: () => {
+						if ($useDialog) $useDialog = false;
+						return "Employee's created.";
+					},
+					error: 'Failed to creating employee.'
+				});
 				console.log('succeed create emp');
 				invalidate('employee:data');
-				setTimeout(() => {
-					if ($useDialog) $useDialog = false;
-				}, 2500);
 				return;
 			} catch (e) {
 				toast.warning('Something went wrong', { description: 'Failed to add new employee.' });
