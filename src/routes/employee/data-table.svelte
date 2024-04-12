@@ -15,8 +15,7 @@
 	import DataTableCheckbox from './data-table-checkbox.svelte';
 	import { Trash2, UserPlus } from 'lucide-svelte';
 	import CreateEmpDialog from './create-emp-dialog.svelte';
-	import { dialogOpen, getEMployee } from './store';
-	import { invalidate } from '$app/navigation';
+	import { dialogOpen, getEMployee } from '$lib/store';
 
 	export let divisions: Division[], positions: Position[];
 

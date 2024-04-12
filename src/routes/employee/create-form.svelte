@@ -5,15 +5,13 @@
 	import { Button } from '$lib/components/ui/button';
 	import { Receipt } from 'lucide-svelte';
 	import { intProxy, stringProxy } from 'sveltekit-superforms';
-	import { getForm } from './store';
+	import { disableResetForm, getForm } from '$lib/store';
 
 	export let divisions: Division[], positions: Position[], submitForm: boolean;
 
-	// export let data: SuperForm<any, any>;
 	const createForm = getForm();
-	// const empUpdate = dataUpdate();
-	// const useDialogOpen = dialogOpen();
-	const { form: formData, enhance, message } = $createForm;
+	const disableResetbtn = disableResetForm();
+	const { form: formData, enhance } = $createForm;
 	const divLookup = (id: number | string) => {
 		const result = divisions.find((e) => e.id == id.toString());
 		return { label: result?.name, value: result?.id };
@@ -35,6 +33,22 @@
 	const formName = stringProxy(formData, 'name', { empty: 'undefined' });
 	const formAge = intProxy(formData, 'age', { empty: 'zero' });
 	const formSalary = intProxy(formData, 'base_salary', { empty: 'zero' });
+
+	const resetForm = () => {
+		$formData = { name: undefined, age: 0, base_salary: 0, division_id: 0, position_id: 0 };
+		$disableResetbtn = true;
+		console.log('reset form');
+	};
+
+	const disableState = () => {
+		if ($disableResetbtn) {
+			console.log('the resetbtn disable state is true, omw to change it');
+			$disableResetbtn = false;
+		} else {
+			console.log('the resetbtn disable state is false, omw to change it');
+			$disableResetbtn = true;
+		}
+	};
 </script>
 
 <form name="createEmp" method="POST" use:enhance>
@@ -62,37 +76,36 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field form={$createForm} name="division">
+	<Form.Field form={$createForm} name="division_id">
 		<Form.Control let:attrs>
 			<Form.Label>Division</Form.Label>
 			<Select.Root
 				selected={selectedDivision}
-				onSelectedChange={(v) => ($formData.division_id = v?.value)}
+				onSelectedChange={(v) => v && ($formData.division_id = v?.value)}
 			>
-				<Select.Trigger class="w-full">
+				<Select.Input name={attrs.name} />
+				<Select.Trigger {...attrs} class="w-full">
 					<Select.Value placeholder="Select a division" />
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Group>
-						{#each divisions as div}
-							<Select.Item value={div.id} label={div.name}>{div.name}</Select.Item>
-						{/each}
-					</Select.Group>
+					{#each divisions as div}
+						<Select.Item value={div.id} label={div.name} />
+					{/each}
 				</Select.Content>
-				<Select.Input {...attrs} name="division" />
 			</Select.Root>
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field form={$createForm} name="position">
+	<Form.Field form={$createForm} name="position_id">
 		<Form.Control let:attrs>
 			<Form.Label>Position</Form.Label>
 			<Select.Root
 				selected={selectedPosition}
 				preventScroll={true}
-				onSelectedChange={(v) => ($formData.position_id = v?.value)}
+				onSelectedChange={(v) => v && ($formData.position_id = v?.value)}
 			>
-				<Select.Trigger class="w-full">
+				<Select.Input name={attrs.name} />
+				<Select.Trigger {...attrs} class="w-full">
 					<Select.Value placeholder="Select a position" />
 				</Select.Trigger>
 				<Select.Content class="overflow-y-auto" fitViewport={true} avoidCollisions={true}>
@@ -102,10 +115,17 @@
 						{/each}
 					</Select.Group>
 				</Select.Content>
-				<Select.Input {...attrs} name="position" />
+				<!-- <Select.Input required {...attrs} name="position" /> -->
 			</Select.Root>
+			<!-- <input hidden bind:value={$formData.position_id_id} name={attrs.name} id={attrs.id} /> -->
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Button id="subBtn" variant="ghost" type="submit"></Button>
+	<div class="mt-4 flex w-full justify-end">
+		<Button id="subBtn" class="hidden" variant="ghost" type="submit"></Button>
+		<Button size="sm" variant="outline" on:click={disableState}>t2</Button>
+		<Button size="sm" disabled={$disableResetbtn} variant="ghost" on:click={resetForm}
+			>reset form</Button
+		>
+	</div>
 </form>

@@ -3,7 +3,7 @@
 	import DataTable from './data-table.svelte';
 	import { employeeSchema, type EmployeeSchema } from './schema';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
-	import { dialogOpen, getEMployee, setEmployee, setForm } from './store';
+	import { dialogOpen, setEmployee, setForm } from '$lib/store';
 	import { invalidate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 
@@ -32,7 +32,14 @@
 		async onUpdate({ form }) {
 			console.log('onUpdate event fired');
 			if (!form.valid) {
-				console.log(form.data);
+				// const selectAtri = ['division_id', 'position_id'];
+				// let toastCounter = 0;
+				// selectAtri.forEach((attr) => {
+				// 	if (!(attr in form.data) && toastCounter++) toast.error(`${attr} field required.`);
+				// });
+				// if (toastCounter <= 0) toast.error('Form is not valid all field required.');
+				toast.error('Please fix the errors in the form.');
+				console.log(form.data, 'form is not valid');
 				return;
 			}
 			try {
@@ -46,7 +53,7 @@
 						if ($useDialog) $useDialog = false;
 						return "Employee's created.";
 					},
-					error: 'Failed to creating employee.'
+					error: 'Failed to create new employee.'
 				});
 				console.log('succeed create emp');
 				invalidate('employee:data');
@@ -60,13 +67,5 @@
 </script>
 
 <div class="mx-auto max-w-3xl py-10">
-	<!-- {#each data.employees as employee}
-		<tr>
-			<td>{employee.name}</td>
-			<td>{employee.age}</td>
-			<td>{employee.position_name}</td>
-		</tr>
-	{/each} -->
-	<!-- <Button size="sm" on:click={refresh}>Refresh</Button> -->
 	<DataTable {divisions} {positions} />
 </div>

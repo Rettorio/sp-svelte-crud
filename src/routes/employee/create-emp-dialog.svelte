@@ -2,12 +2,16 @@
 	import * as AlertDialog from '$lib/components/ui/alert-dialog';
 	import CreateForm from './create-form.svelte';
 	import Button from '$lib/components/ui/button/button.svelte';
-	import { dialogOpen } from './store';
+	import { dialogOpen, disableResetForm } from '$lib/store';
 
 	const useDialogOpen = dialogOpen();
 	// export let form: SuperForm<any, any>;
 	export let divisions: any[], positions: any[];
 	let submit = false;
+	const disableResetbtn = disableResetForm();
+	$: if (submit) {
+		disableResetbtn.set(false);
+	}
 </script>
 
 <AlertDialog.Root bind:open={$useDialogOpen}>
