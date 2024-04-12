@@ -22,10 +22,6 @@ export const GET: RequestHandler = async ({ url, locals, setHeaders }) => {
 		error(500, err.details);
 	}
 
-	setHeaders({
-		'Cache-Control': 'max-age=1800'
-	});
-
 	return json(employee);
 };
 
