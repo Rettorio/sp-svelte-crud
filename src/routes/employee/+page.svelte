@@ -3,15 +3,9 @@
 	import DataTable from './data-table.svelte';
 	import { employeeSchema, type EmployeeSchema } from './schema';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
-	import {
-		closeDialogAfterSubmit,
-		dialogOpen,
-		disableResetForm,
-		setEmployee,
-		setForm
-	} from '$lib/store';
-	import { invalidate } from '$app/navigation';
+	import { dialogOpen, disableResetForm, setEmployee, setForm } from '$lib/store';
 	import { toast } from 'svelte-sonner';
+	import { useStorage } from '$lib/use-shared-store';
 
 	export let data;
 
@@ -26,7 +20,7 @@
 	const { divisions, positions } = data;
 	const UseEmployee = setEmployee(data.employees);
 	const useResetBtn = disableResetForm();
-	const useAutoMode = closeDialogAfterSubmit();
+	const useAutoMode = useStorage('AutoMode', true);
 	const useDialog = dialogOpen();
 	$: if (data.employees.length !== $UseEmployee.length) {
 		$UseEmployee = data.employees;

@@ -4,15 +4,17 @@
 	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
 	import { Receipt } from 'lucide-svelte';
-	import { closeDialogAfterSubmit, disableResetForm, getForm } from '$lib/store';
+	import { disableResetForm, getForm } from '$lib/store';
 	import { Switch } from '$lib/components/ui/switch';
 	import { Label } from '$lib/components/ui/label';
+	import { browser } from '$app/environment';
+	import { useStorage } from '$lib/use-shared-store';
 
 	export let divisions: Division[], positions: Position[];
 
 	const createForm = getForm();
 	const disableResetbtn = disableResetForm();
-	const useAutoMode = closeDialogAfterSubmit();
+	const useAutoMode = useStorage('AutoMode', true);
 	const { form: formData, enhance } = $createForm;
 	const divLookup = (id: number | string) => {
 		const result = divisions.find((e) => e.id == id.toString());
