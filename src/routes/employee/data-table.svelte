@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { readable } from 'svelte/store';
 	import { createRender, createTable, Render, Subscribe } from 'svelte-headless-table';
 	import {
 		addPagination,

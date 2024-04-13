@@ -22,13 +22,16 @@ export const GET: RequestHandler = async ({ url, locals, setHeaders }) => {
 		error(500, err.details);
 	}
 
+	// setHeaders({
+	// 	'Cache-Control': 'max-age: 3600'
+	// });
+
 	return json(employee);
 };
 
 export const POST: RequestHandler = async ({ request, locals }) => {
 	const { supabase } = locals;
 	const data = await request.json();
-	// const {name, age, base_salary, position_id, divisition_id} = await request.json();
 	const { error: err } = await supabase.from('employee').insert(data);
 	if (err && err instanceof AuthApiError) {
 		error(500, 'Something went wrong');

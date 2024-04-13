@@ -7,7 +7,7 @@
 	import { intProxy, stringProxy } from 'sveltekit-superforms';
 	import { disableResetForm, getForm } from '$lib/store';
 
-	export let divisions: Division[], positions: Position[], submitForm: boolean;
+	export let divisions: Division[], positions: Position[];
 
 	const createForm = getForm();
 	const disableResetbtn = disableResetForm();
@@ -20,34 +20,29 @@
 		const result = positions.find((e) => e.id == id.toString());
 		return { label: result?.name, value: result?.id };
 	};
-	$: selectedDivision = $formData.division_id ? divLookup($formData.division_id) : undefined;
+	$: selectedDivision = $formData.division_id
+		? divLookup($formData.division_id)
+		: { label: 'Select a division', value: '0' };
 
-	$: selectedPosition = $formData.position_id ? postLookup($formData.position_id) : undefined;
+	$: selectedPosition = $formData.position_id
+		? postLookup($formData.position_id)
+		: { label: 'Select a position', value: '0' };
 
-	$: if (submitForm) {
-		const myForm: HTMLFormElement = Array.from(document.forms)[0];
-		const btn = document.getElementById('subBtn');
-		myForm.requestSubmit(btn);
-		submitForm = false;
+	$: {
+		console.log(`disable prop is ${$disableResetbtn} in btn`);
 	}
+
 	const formName = stringProxy(formData, 'name', { empty: 'undefined' });
 	const formAge = intProxy(formData, 'age', { empty: 'zero' });
 	const formSalary = intProxy(formData, 'base_salary', { empty: 'zero' });
 
 	const resetForm = () => {
-		$formData = { name: undefined, age: 0, base_salary: 0, division_id: 0, position_id: 0 };
+		$formData = { name: '', age: 20, base_salary: 10000, division_id: 0, position_id: 0 };
+		$formName = '';
+		$formAge = 20;
+		$formSalary = 10000;
 		$disableResetbtn = true;
-		console.log('reset form');
-	};
-
-	const disableState = () => {
-		if ($disableResetbtn) {
-			console.log('the resetbtn disable state is true, omw to change it');
-			$disableResetbtn = false;
-		} else {
-			console.log('the resetbtn disable state is false, omw to change it');
-			$disableResetbtn = true;
-		}
+		console.log('reset form', $formData, $formName, $formAge, $formSalary);
 	};
 </script>
 
@@ -55,14 +50,16 @@
 	<Form.Field form={$createForm} name="name">
 		<Form.Control let:attrs>
 			<Form.Label>Name</Form.Label>
-			<Input {...attrs} bind:value={$formName} />
+			<Input {...attrs} bind:value={$formData.name} />
+			<!-- <Input {...attrs} bind:value={$formName} /> -->
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
 	<Form.Field form={$createForm} name="age">
 		<Form.Control let:attrs>
 			<Form.Label>Age</Form.Label>
-			<Input type="number" {...attrs} bind:value={$formAge} />
+			<Input type="number" {...attrs} bind:value={$formData.age} />
+			<!-- <Input type="number" {...attrs} bind:value={$formAge} /> -->
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -71,7 +68,8 @@
 			<Form.Label>Base salary</Form.Label>
 			<div class="flex w-full items-center space-x-2">
 				<Receipt class="h-6 w-6" />
-				<Input type="number" {...attrs} bind:value={$formSalary} />
+				<Input type="number" {...attrs} bind:value={$formData.base_salary} />
+				<!-- <Input type="number" {...attrs} bind:value={$formSalary} /> -->
 			</div>
 		</Form.Control>
 		<Form.FieldErrors />
@@ -123,7 +121,6 @@
 	</Form.Field>
 	<div class="mt-4 flex w-full justify-end">
 		<Button id="subBtn" class="hidden" variant="ghost" type="submit"></Button>
-		<Button size="sm" variant="outline" on:click={disableState}>t2</Button>
 		<Button size="sm" disabled={$disableResetbtn} variant="ghost" on:click={resetForm}
 			>reset form</Button
 		>

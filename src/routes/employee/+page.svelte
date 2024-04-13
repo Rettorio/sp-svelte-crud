@@ -3,7 +3,7 @@
 	import DataTable from './data-table.svelte';
 	import { employeeSchema, type EmployeeSchema } from './schema';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
-	import { dialogOpen, setEmployee, setForm } from '$lib/store';
+	import { dialogOpen, disableResetForm, setEmployee, setForm } from '$lib/store';
 	import { invalidate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 
@@ -19,6 +19,7 @@
 	//@ts-ignore
 	const { divisions, positions } = data;
 	const UseEmployee = setEmployee(data.employees);
+	const useResetBtn = disableResetForm();
 	const useDialog = dialogOpen();
 	$: if (data.employees.length !== $UseEmployee.length) {
 		$UseEmployee = data.employees;
@@ -32,12 +33,6 @@
 		async onUpdate({ form }) {
 			console.log('onUpdate event fired');
 			if (!form.valid) {
-				// const selectAtri = ['division_id', 'position_id'];
-				// let toastCounter = 0;
-				// selectAtri.forEach((attr) => {
-				// 	if (!(attr in form.data) && toastCounter++) toast.error(`${attr} field required.`);
-				// });
-				// if (toastCounter <= 0) toast.error('Form is not valid all field required.');
 				toast.error('Please fix the errors in the form.');
 				console.log(form.data, 'form is not valid');
 				return;
@@ -55,8 +50,9 @@
 					},
 					error: 'Failed to create new employee.'
 				});
-				console.log('succeed create emp');
-				invalidate('employee:data');
+				// await invalidate('employee:data');
+				$useResetBtn = false;
+				console.log('succeed create emp', form.data);
 				return;
 			} catch (e) {
 				toast.warning('Something went wrong', { description: 'Failed to add new employee.' });
