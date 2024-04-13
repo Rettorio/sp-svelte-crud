@@ -3,7 +3,13 @@
 	import DataTable from './data-table.svelte';
 	import { employeeSchema, type EmployeeSchema } from './schema';
 	import { zod, zodClient } from 'sveltekit-superforms/adapters';
-	import { dialogOpen, disableResetForm, setEmployee, setForm } from '$lib/store';
+	import {
+		closeDialogAfterSubmit,
+		dialogOpen,
+		disableResetForm,
+		setEmployee,
+		setForm
+	} from '$lib/store';
 	import { invalidate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 
@@ -20,6 +26,7 @@
 	const { divisions, positions } = data;
 	const UseEmployee = setEmployee(data.employees);
 	const useResetBtn = disableResetForm();
+	const useAutoMode = closeDialogAfterSubmit();
 	const useDialog = dialogOpen();
 	$: if (data.employees.length !== $UseEmployee.length) {
 		$UseEmployee = data.employees;
@@ -45,12 +52,11 @@
 				toast.promise(response, {
 					loading: 'Creating employe...',
 					success: () => {
-						if ($useDialog) $useDialog = false;
+						if ($useDialog && $useAutoMode) $useDialog = false;
 						return "Employee's created.";
 					},
 					error: 'Failed to create new employee.'
 				});
-				// await invalidate('employee:data');
 				$useResetBtn = false;
 				console.log('succeed create emp', form.data);
 				return;

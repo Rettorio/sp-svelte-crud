@@ -4,13 +4,15 @@
 	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
 	import { Receipt } from 'lucide-svelte';
-	import { intProxy, stringProxy } from 'sveltekit-superforms';
-	import { disableResetForm, getForm } from '$lib/store';
+	import { closeDialogAfterSubmit, disableResetForm, getForm } from '$lib/store';
+	import { Switch } from '$lib/components/ui/switch';
+	import { Label } from '$lib/components/ui/label';
 
 	export let divisions: Division[], positions: Position[];
 
 	const createForm = getForm();
 	const disableResetbtn = disableResetForm();
+	const useAutoMode = closeDialogAfterSubmit();
 	const { form: formData, enhance } = $createForm;
 	const divLookup = (id: number | string) => {
 		const result = divisions.find((e) => e.id == id.toString());
@@ -30,19 +32,13 @@
 
 	$: {
 		console.log(`disable prop is ${$disableResetbtn} in btn`);
+		console.log(`AutoMode state is ${$useAutoMode}`);
 	}
-
-	const formName = stringProxy(formData, 'name', { empty: 'undefined' });
-	const formAge = intProxy(formData, 'age', { empty: 'zero' });
-	const formSalary = intProxy(formData, 'base_salary', { empty: 'zero' });
 
 	const resetForm = () => {
 		$formData = { name: '', age: 20, base_salary: 10000, division_id: 0, position_id: 0 };
-		$formName = '';
-		$formAge = 20;
-		$formSalary = 10000;
 		$disableResetbtn = true;
-		console.log('reset form', $formData, $formName, $formAge, $formSalary);
+		console.log('reset form', $formData);
 	};
 </script>
 
@@ -51,7 +47,6 @@
 		<Form.Control let:attrs>
 			<Form.Label>Name</Form.Label>
 			<Input {...attrs} bind:value={$formData.name} />
-			<!-- <Input {...attrs} bind:value={$formName} /> -->
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -59,7 +54,6 @@
 		<Form.Control let:attrs>
 			<Form.Label>Age</Form.Label>
 			<Input type="number" {...attrs} bind:value={$formData.age} />
-			<!-- <Input type="number" {...attrs} bind:value={$formAge} /> -->
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
@@ -69,7 +63,6 @@
 			<div class="flex w-full items-center space-x-2">
 				<Receipt class="h-6 w-6" />
 				<Input type="number" {...attrs} bind:value={$formData.base_salary} />
-				<!-- <Input type="number" {...attrs} bind:value={$formSalary} /> -->
 			</div>
 		</Form.Control>
 		<Form.FieldErrors />
@@ -119,7 +112,11 @@
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<div class="mt-4 flex w-full justify-end">
+	<div class="mt-4 flex w-full justify-between">
+		<div class="flex items-center space-x-2">
+			<Switch bind:checked={$useAutoMode} id="autoMode" />
+			<Label for="autoMode">AutoClose form</Label>
+		</div>
 		<Button id="subBtn" class="hidden" variant="ghost" type="submit"></Button>
 		<Button size="sm" disabled={$disableResetbtn} variant="ghost" on:click={resetForm}
 			>reset form</Button
