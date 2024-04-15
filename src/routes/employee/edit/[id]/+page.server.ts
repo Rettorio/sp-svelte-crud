@@ -5,14 +5,14 @@ import { zod } from 'sveltekit-superforms/adapters';
 import { employeeSchema, type EmployeeSchema } from '../../schema';
 import type { z } from 'zod';
 
-export const load: PageServerLoad = async ({ locals, params, request }) => {
+export const load: PageServerLoad = async ({ locals, params, request, fetch }) => {
 	const { supabase } = locals;
 	const empId = params.id;
 	const referrerUrl = request.headers.get('Referer');
 
 	const { data: employee, error: err } = await supabase
 		.from('employee')
-		.select()
+		.select('*')
 		.eq('id', empId)
 		.single();
 
@@ -21,22 +21,23 @@ export const load: PageServerLoad = async ({ locals, params, request }) => {
 	if (err && err instanceof AuthApiError) {
 		return fail(400, { form });
 	}
-	// const { data: divisions, error: errDiv } = await supabase.from('division').select();
-	// const { data: positions, error: errPos } = await supabase.from('position').select();
 
-	// if ((errDiv && errDiv instanceof AuthApiError) || (errPos && errPos instanceof AuthApiError)) {
-	// 	throw error(500, { message: 'Something went wrong' });
-	// }
+	const divisions: Division[] = await (await fetch('/api/divisions')).json();
+	const positions: Position[] = await (await fetch('/api/positions')).json();
 
 	return {
 		form,
-		referrerUrl
+		referrerUrl,
+		divisions,
+		positions
 	};
 };
 
 export const actions: Actions = {
 	update: async (event) => {
-		const form = await superValidate(event, zod(employeeSchema));
+		const formData = await event.request.formData();
+		const form = await superValidate(formData, zod(employeeSchema));
+		console.log(form.valid, formData);
 		if (!form.valid) {
 			return fail(400, { form });
 		}

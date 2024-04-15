@@ -18,6 +18,7 @@ export const useWritable = <T>(name: string, value: T) => useSharedStore(name, w
 // readable store context
 export const useReadable = <T>(name: string, value: T) => useSharedStore(name, readable, value);
 
+//persistent store
 export const useStorage = <T>(key: string, initialValue: T) => {
 	let serialize = JSON.stringify;
 	let deserialize = JSON.parse;

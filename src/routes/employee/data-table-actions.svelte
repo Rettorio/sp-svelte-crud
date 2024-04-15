@@ -18,7 +18,6 @@
 			<DropdownMenu.Item>
 				<a class="underline-offset-2 hover:underline" href={'/employee/edit/' + id}>Edit employee</a
 				>
-				<!-- <Button variant="link" href={'/employee/edit/' + id}>Edit employee</Button> -->
 			</DropdownMenu.Item>
 		</DropdownMenu.Group>
 		<DropdownMenu.Separator />

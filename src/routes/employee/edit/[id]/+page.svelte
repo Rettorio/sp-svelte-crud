@@ -8,16 +8,17 @@
 	import * as Alert from '$lib/components/ui/alert';
 	import { FileCheck } from 'lucide-svelte';
 
-	export let data: PageServerData;
+	export let data;
 	const formD: SuperValidated<Infer<EmployeeSchema>> | any = data.form;
-	const { divisions, positions, referrerUrl } = data;
+	const { referrerUrl } = data;
 
 	const form = superForm(formD, {
 		validators: zodClient(employeeSchema),
-		resetForm: false,
-		dataType: 'json'
+		resetForm: false
 	});
 	const { message } = form;
+	const division = data.divisions!;
+	const position = data.positions!;
 </script>
 
 <div class="mx-auto mt-14 max-w-xl">
@@ -33,10 +34,9 @@
 	<Card.Root class="mx-auto w-[350px]">
 		<Card.Header>
 			<Card.Title>Employee Edit</Card.Title>
-			<!-- <Card.Description>You need to sign in 🔐 to continue.</Card.Description> -->
 		</Card.Header>
 		<Card.Content>
-			<EditForm data={form} fromUrl={referrerUrl} division={divisions} position={positions} />
+			<EditForm data={form} fromUrl={referrerUrl} {division} {position} />
 		</Card.Content>
 	</Card.Root>
 </div>

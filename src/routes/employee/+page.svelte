@@ -47,12 +47,12 @@
 					loading: 'Creating employe...',
 					success: () => {
 						if ($useDialog && $useAutoMode) $useDialog = false;
-						return "Employee's created.";
+						return 'New employee have been created.';
 					},
 					error: 'Failed to create new employee.'
 				});
 				$useResetBtn = false;
-				console.log('succeed create emp', form.data);
+				console.log('succeed create emp');
 				return;
 			} catch (e) {
 				toast.warning('Something went wrong', { description: 'Failed to add new employee.' });

@@ -32,11 +32,6 @@
 		? postLookup($formData.position_id)
 		: { label: 'Select a position', value: '0' };
 
-	$: {
-		console.log(`disable prop is ${$disableResetbtn} in btn`);
-		console.log(`AutoMode state is ${$useAutoMode}`);
-	}
-
 	const resetForm = () => {
 		$formData = { name: '', age: 20, base_salary: 10000, division_id: 0, position_id: 0 };
 		$disableResetbtn = true;
@@ -108,9 +103,7 @@
 						{/each}
 					</Select.Group>
 				</Select.Content>
-				<!-- <Select.Input required {...attrs} name="position" /> -->
 			</Select.Root>
-			<!-- <input hidden bind:value={$formData.position_id_id} name={attrs.name} id={attrs.id} /> -->
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>

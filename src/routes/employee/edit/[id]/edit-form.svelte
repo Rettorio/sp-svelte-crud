@@ -11,21 +11,21 @@
 	export let data: any;
 	const { form: formData, enhance } = data;
 
-	const currentDivision = division.find((e) => e.id == $formData?.division_id);
-	const currentPosition = position.find((e) => e.id == $formData?.position_id);
+	const divLookup = (id: number | string) => {
+		const result = division.find((e) => e.id == id.toString());
+		return { label: result?.name, value: result?.id };
+	};
+	const postLookup = (id: number | string) => {
+		const result = position.find((e) => e.id == id.toString());
+		return { label: result?.name, value: result?.id };
+	};
 	$: selectedDivision = $formData.division_id
-		? {
-				label: currentDivision?.name,
-				value: currentDivision?.id
-			}
-		: undefined;
+		? divLookup($formData.division_id)
+		: { label: 'Select a division', value: '0' };
 
 	$: selectedPosition = $formData.position_id
-		? {
-				label: currentPosition?.name,
-				value: currentPosition?.id
-			}
-		: undefined;
+		? postLookup($formData.position_id)
+		: { label: 'Select a position', value: '0' };
 
 	const currentUrl = $page.url.origin + $page.url.pathname;
 	const getPrevUrl = fromUrl && fromUrl !== currentUrl ? fromUrl : '/employee';
@@ -51,35 +51,42 @@
 			<Form.Label>Base salary</Form.Label>
 			<div class="flex w-full items-center space-x-2">
 				<Receipt class="h-6 w-6" />
-				<Input {...attrs} bind:value={$formData.base_salary} />
+				<Input {...attrs} type="number" bind:value={$formData.base_salary} />
 			</div>
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field form={data} name="division">
+	<Form.Field form={data} name="division_id">
 		<Form.Control let:attrs>
 			<Form.Label>Division</Form.Label>
-			<Select.Root selected={selectedDivision}>
-				<Select.Trigger class="w-full">
+			<Select.Root
+				preventScroll={true}
+				selected={selectedDivision}
+				onSelectedChange={(v) => v && ($formData.position_id = v?.value)}
+			>
+				<Select.Input name={attrs.name} />
+				<Select.Trigger {...attrs} class="w-full">
 					<Select.Value placeholder="Select a division" />
 				</Select.Trigger>
 				<Select.Content>
-					<Select.Group>
-						{#each division as div}
-							<Select.Item value={div.id} label={div.name}>{div.name}</Select.Item>
-						{/each}
-					</Select.Group>
+					{#each division as div}
+						<Select.Item value={div.id} label={div.name}>{div.name}</Select.Item>
+					{/each}
 				</Select.Content>
-				<Select.Input {...attrs} name="division" />
 			</Select.Root>
 		</Form.Control>
 		<Form.FieldErrors />
 	</Form.Field>
-	<Form.Field form={data} name="position">
+	<Form.Field form={data} name="position_id">
 		<Form.Control let:attrs>
 			<Form.Label>Position</Form.Label>
-			<Select.Root preventScroll={true} selected={selectedPosition}>
-				<Select.Trigger class="w-full">
+			<Select.Root
+				preventScroll={true}
+				selected={selectedPosition}
+				onSelectedChange={(v) => v && ($formData.position_id = v?.value)}
+			>
+				<Select.Input name={attrs.name} />
+				<Select.Trigger {...attrs} class="w-full">
 					<Select.Value placeholder="Select a position" />
 				</Select.Trigger>
 				<Select.Content class="overflow-y-auto" fitViewport={true} avoidCollisions={true}>
@@ -89,7 +96,6 @@
 						{/each}
 					</Select.Group>
 				</Select.Content>
-				<Select.Input {...attrs} name="position" />
 			</Select.Root>
 		</Form.Control>
 		<Form.FieldErrors />
