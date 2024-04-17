@@ -22,6 +22,7 @@
 	const useResetBtn = disableResetForm();
 	const useAutoMode = useStorage('AutoMode', true);
 	const useDialog = dialogOpen();
+
 	$: if (data.employees.length !== $UseEmployee.length) {
 		$UseEmployee = data.employees;
 		console.log('employee data have been updated');

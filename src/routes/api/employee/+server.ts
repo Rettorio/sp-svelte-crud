@@ -39,3 +39,10 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 	return json({ message: 'Employee created Succesfuly' }, { status: 201 });
 };
+
+export const DELETE: RequestHandler = async ({ request, locals }) => {
+	const { supabase } = locals;
+	const data = await request.json();
+	await supabase.rpc('delete_emp_arr', { arr: data.ids });
+	return json({ message: 'success delete employees' }, { status: 202 });
+};

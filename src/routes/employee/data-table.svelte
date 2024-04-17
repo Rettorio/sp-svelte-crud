@@ -15,6 +15,8 @@
 	import { Trash2, UserPlus } from 'lucide-svelte';
 	import CreateEmpDialog from './create-emp-dialog.svelte';
 	import { dialogOpen, getEMployee } from '$lib/store';
+	import { toast } from 'svelte-sonner';
+	import { invalidate } from '$app/navigation';
 
 	export let divisions: Division[], positions: Position[];
 
@@ -127,6 +129,35 @@
 	const { selectedDataIds } = pluginStates.select;
 	const allowedHeader = ['name', 'division', 'salary'];
 
+	// $: {
+	// 	const arr = Object.keys($selectedDataIds).map((order) => {
+	// 		return $getEmployees[parseInt(order)].id;
+	// 	});
+	// 	console.log(arr);
+	// }
+
+	let disableRedbtn: boolean;
+	$: disableRedbtn = Object.keys($selectedDataIds).length == 0;
+	const deleteSelected = async () => {
+		const ids = Object.keys($selectedDataIds).map((order) => {
+			return $getEmployees[parseInt(order)].id;
+		});
+		const response = fetch('/api/employee', {
+			method: 'DELETE',
+			body: JSON.stringify({ ids: ids })
+		});
+		toast.promise(response, {
+			loading: 'Deleting employee...',
+			success: () => {
+				invalidate('employee:data');
+				return 'Employee have been deleted.';
+			},
+			error: 'Failed to delete selected employe.'
+		});
+		// getEmployees.update((val) => val.filter((obj) => !ids.includes(obj.id)));
+		$selectedDataIds = {};
+	};
+
 	const useDialog = dialogOpen();
 </script>
 
@@ -134,8 +165,12 @@
 	<div class="flex items-center justify-between py-4">
 		<Input class="max-w-sm" placeholder="Search employee" type="text" bind:value={$filterValue} />
 		<div class="flex items-center">
-			<Button size="sm" class="mr-2" disabled variant="outline"
-				><Trash2 size="16" class="mr-1" />Delete</Button
+			<Button
+				on:click={deleteSelected}
+				size="sm"
+				class="mr-2"
+				disabled={disableRedbtn}
+				variant="outline"><Trash2 size="16" class="mr-1" />Delete</Button
 			>
 			<Button on:click={() => ($useDialog = true)} size="sm" variant="default"
 				><UserPlus size="16" class="mr-1" />Create</Button
