@@ -4,7 +4,8 @@
 		addPagination,
 		addTableFilter,
 		addSortBy,
-		addSelectedRows
+		addSelectedRows,
+		addColumnFilters
 	} from 'svelte-headless-table/plugins';
 	import * as Table from '$lib/components/ui/table';
 	import DataTableActions from './data-table-actions.svelte';
@@ -17,8 +18,8 @@
 	import { dialogOpen, getEMployee } from '$lib/store';
 	import { toast } from 'svelte-sonner';
 	import { invalidate } from '$app/navigation';
-
-	export let divisions: Division[], positions: Position[];
+	import DataTableToolbar from './data-table-toolbar.svelte';
+	import { get } from 'svelte/store';
 
 	const getEmployees = getEMployee();
 	const table = createTable(getEmployees, {
@@ -28,6 +29,7 @@
 			fn: ({ filterValue, value }) =>
 				value.toLocaleLowerCase().includes(filterValue.toLocaleLowerCase())
 		}),
+		colFilter: addColumnFilters(),
 		select: addSelectedRows()
 	});
 	const columns = table.createColumns([
@@ -78,6 +80,19 @@
 			plugins: {
 				filter: {
 					exclude: true
+				},
+				colFilter: {
+					fn: ({ filterValue, value }) => {
+						if (filterValue.length === 0) return true;
+						if (!Array.isArray(filterValue) || typeof value !== 'string') return true;
+						return filterValue.some((filter) => {
+							return value.includes(filter);
+						});
+					},
+					initialFilterValue: [],
+					render: ({ filterValue }) => {
+						return get(filterValue);
+					}
 				}
 			}
 		}),
@@ -122,62 +137,15 @@
 		})
 	]);
 
-	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, flatColumns, rows } =
-		table.createViewModel(columns);
+	const tableModel = table.createViewModel(columns);
+	const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates, rows } = tableModel;
 	const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
-	const { filterValue } = pluginStates.filter;
 	const { selectedDataIds } = pluginStates.select;
 	const allowedHeader = ['name', 'division', 'salary'];
-
-	// $: {
-	// 	const arr = Object.keys($selectedDataIds).map((order) => {
-	// 		return $getEmployees[parseInt(order)].id;
-	// 	});
-	// 	console.log(arr);
-	// }
-
-	let disableRedbtn: boolean;
-	$: disableRedbtn = Object.keys($selectedDataIds).length == 0;
-	const deleteSelected = async () => {
-		const ids = Object.keys($selectedDataIds).map((order) => {
-			return $getEmployees[parseInt(order)].id;
-		});
-		const response = fetch('/api/employee', {
-			method: 'DELETE',
-			body: JSON.stringify({ ids: ids })
-		});
-		toast.promise(response, {
-			loading: 'Deleting employee...',
-			success: () => {
-				invalidate('employee:data');
-				return 'Employee have been deleted.';
-			},
-			error: 'Failed to delete selected employe.'
-		});
-		// getEmployees.update((val) => val.filter((obj) => !ids.includes(obj.id)));
-		$selectedDataIds = {};
-	};
-
-	const useDialog = dialogOpen();
 </script>
 
 <div>
-	<div class="flex items-center justify-between py-4">
-		<Input class="max-w-sm" placeholder="Search employee" type="text" bind:value={$filterValue} />
-		<div class="flex items-center">
-			<Button
-				on:click={deleteSelected}
-				size="sm"
-				class="mr-2"
-				disabled={disableRedbtn}
-				variant="outline"><Trash2 size="16" class="mr-1" />Delete</Button
-			>
-			<Button on:click={() => ($useDialog = true)} size="sm" variant="default"
-				><UserPlus size="16" class="mr-1" />Create</Button
-			>
-			<CreateEmpDialog {divisions} {positions} />
-		</div>
-	</div>
+	<DataTableToolbar {selectedDataIds} {tableModel} />
 	<div class="rounded-md border">
 		<Table.Root {...$tableAttrs}>
 			<Table.Header>

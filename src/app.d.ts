@@ -34,6 +34,11 @@ declare global {
 		salary_rate: number | string;
 	};
 
+	type ColumnTable = {
+		label: string;
+		value: any;
+	};
+
 	type Position = {
 		id: string;
 		name: string;

@@ -12,4 +12,10 @@ export const dialogOpen = () => useWritable('dialogOpen', false);
 export const setEmployee = (data: Employee[]) => useWritable('employee_data', data);
 export const getEMployee = () => getContext<Writable<Employee[]>>('employee_data');
 
+export const setDivision = (data: Division[]) => useWritable('division_data', data);
+export const getDivision = () => getContext<Writable<Division[]>>('division_data');
+
+export const setPosition = (data: Position[]) => useWritable('Position_data', data);
+export const getPosition = () => getContext<Writable<Position[]>>('Position_data');
+
 export const disableResetForm = () => useWritable('resetFormdisable', true);

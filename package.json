@@ -39,8 +39,9 @@
 	"dependencies": {
 		"@supabase/ssr": "^0.1.0",
 		"@supabase/supabase-js": "^2.40.0",
-		"bits-ui": "^0.21.3",
+		"bits-ui": "^0.21.4",
 		"clsx": "^2.1.0",
+		"cmdk-sv": "^0.0.17",
 		"formsnap": "^0.5.1",
 		"lucide-svelte": "^0.363.0",
 		"mode-watcher": "^0.3.0",
